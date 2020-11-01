@@ -1,5 +1,5 @@
 /*
-Copyright 2017 Jun Wako <wakojun@gmail.com>
+Copyright 2020 Luke Zambella
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -79,6 +79,11 @@ uint8_t matrix_scan(void)
 }
 
 inline
+/*
+* Get a single row in the matrix array
+* Each row contains bits that represent the columns in the matrix
+* So row 1 may have 0110 for col[3:0]
+*/
 matrix_row_t matrix_get_row(uint8_t row)
 {
     return matrix[row];
@@ -121,6 +126,9 @@ inline
 static void unselect_rows(void)
 {
     // Quick hack
+    // sets the read mode to normal on the col pins each call
+    // which is what it defaults too anyway
+    // The lower three bits of port B are the row pins
     PORTB = 0b00000000;
 }
 
@@ -131,13 +139,16 @@ inline
 static void select_row(uint8_t row)
 {
     switch (row) {
+        // Row 1 (pin B0)
         case 0:
             PORTB |= (1<<0);
             break;
         case 1:
+        // Row 2 (pin B1)
             PORTB |= (1<<1);
             break;
         case 2:
+        // Row 3 (Pin B2)
             PORTB |= (1<<2);
             break;
     }
