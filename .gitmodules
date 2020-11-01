@@ -1,0 +1,3 @@
+[submodule "fork"]
+	path = tmk_core
+	url = https://github.com/lzambella/tmk_core.git
