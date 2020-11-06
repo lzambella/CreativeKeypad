@@ -46,11 +46,12 @@ TMK_DIR = ../tmk_core
 
 # Directory keyboard dependent files exist
 TARGET_DIR = ../build
-
 # project specific files
 SRC =	keymap.c \
 	matrix.c \
-	led.c
+	led.c \
+	encoder.h \
+	encoder.c
 
 CONFIG_H = config.h
 

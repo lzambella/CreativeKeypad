@@ -25,20 +25,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "timer.h"
 #include "matrix.h"
 #include <util/delay.h>
-
+#include "encoder.h"
 
 #ifndef DEBOUNCE
 # define DEBOUNCE	5
 #endif
+#define NUM_ROWS 3
 /* matrix state(1:on, 0:off) */
 // The matrix array contains binary data for each cell relating to that particular row
 // so row 1 could have 0b0110 in matrix[0] meaning columns 1 and 4 have read something
 static matrix_row_t matrix[MATRIX_ROWS];
-
+static int8_t * encoderRes;
 static uint8_t read_cols(void);
 static void unselect_rows(void);
 static void select_row(uint8_t row);
 
+// Variable to store the current row
+uint8_t curRow = 0;
+/**
+ * Variable that determines whether
+ * the timer is waiting to settle high (1) or low (0)
+ * When this is 1 we are waiting for the current row pin
+ * to settle after being set to high otherwise
+ * we are waiting for it to settle after being set to low
+ */
+uint8_t settleEdge = 1;
 
 /**
  * Initialize the matrix by setting all the keys
@@ -46,35 +57,60 @@ static void select_row(uint8_t row);
  */
 void matrix_init(void)
 {
-    // Set all bits to high for open switch
+    // Set all bits to low
     for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-        matrix[i] = ~0;
+        matrix[i] = 1;
     }
     // initialize columns to normal input and rows to output
     // Actual switches use a pull up design with hardware debouncing
-    // (0: LOW, 1: HIGH) when DDRx[n] == 1
-    // (0: NORMAL, 1: PULLUP) when DDRx[n] == 0
+    // (0: LOW, 1: HIGH) when DDRx[n] == 1 or OUTPUT
+    // (0: NORMAL, 1: PULLUP) when DDRx[n] == 0 or INPUT
     DDRB = 0b01110111;
-    DDRD = 0b11111100;
-    PORTB = 0b00000000;
-    PORTD = 0b00000000;
+    DDRD = 0b11110100;
+    PORTB =0b00000000;
+    PORTD =0b00000000;
     print("Init. matrix\n");
 }
 
 uint8_t matrix_scan(void)
 {
-    // Iterate over each row
-    for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-        select_row(i);
-        _delay_ms(5);
+    /** Check the status of the timer
+     * If the timer count is greater than the threshold
+     * then either read the columns or disable all rows
+     * We need to let each row settle for a very long time
+     * because reason and using a timer ensures that its
+     * nonblocking to reading the encoders
+    */
+   if (timer_read() > 8 && settleEdge == 1) {
         // Read the current column
         uint8_t cols = read_cols();
         // Set the current matrix row array cell to the column inputs
-        matrix[i] = cols;
-        // Set all rows to zero
+        matrix[curRow] = cols;
+
+        // Disable all rows
         unselect_rows();
-        _delay_ms(5);
-    }
+        // increment the next row or reset it
+        curRow++;
+        if (curRow >= NUM_ROWS)
+            curRow = 0;
+        // Now set the settle timer to falling
+        settleEdge = 0;
+        timer_clear();
+   } else if (timer_read() > 8 && settleEdge == 0) {
+        // here we wait approx 6ms before enabling the next row
+        // When the timer fires with settleEdge = 0 
+        // select the next row (which was incremented from before)
+        select_row(curRow);
+
+        // set the edge timer to one
+        settleEdge = 1;
+        // reset timer
+        timer_clear();
+   }
+    // Check the encoders
+    // super hack to put it here
+    // readEncoders();
+    uint8_t * dirs = getDirection();
     return 1;
 }
 
@@ -110,10 +146,6 @@ static uint8_t read_cols()
     C = C | c2 << 1;
     C = C | c3 << 2;
     C = C | c4 << 3;
-    print("Col 1: "); phex(c1); print("\n");
-    print("Col 2: "); phex(c2); print("\n");
-    print("Col 3: "); phex(c3); print("\n");
-    print("Col 4: "); phex(c4); print("\n");
     return C;
 
 }
@@ -141,15 +173,15 @@ static void select_row(uint8_t row)
     switch (row) {
         // Row 1 (pin B0)
         case 0:
-            PORTB |= (1<<0);
+            PORTB = (1<<0);
             break;
         case 1:
         // Row 2 (pin B1)
-            PORTB |= (1<<1);
+            PORTB = (1<<1);
             break;
         case 2:
         // Row 3 (Pin B2)
-            PORTB |= (1<<2);
+            PORTB = (1<<2);
             break;
     }
 }
