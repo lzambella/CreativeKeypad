@@ -27,7 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /*
 For now, hardcode the keys and map them to standard ASCII keys
-TMK has function specific keys that could be read from comptuer software and translate that to ascii however
+TMK has function specific keys that could be read from computer software and translate that to ascii however
+
+The last 3 rows correspond to the encoder outputs
+so there are two 'columns' each dedicated to the clockwise/counter clockwise direction
 */
 #define KEYMAP( \
     K00, K01, K02, K03, \

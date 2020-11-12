@@ -21,28 +21,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keycode.h"
 #include <util/delay.h>
 #include "debug.h"
+#include "actionmap.h"
 /**
  * Teensy pin assignment 
  */
+// encoder 1 (middle right)
 #define ENCA_PINA ((PINC >> 6) & 1)
 #define ENCA_PINB ((PINC >> 7) & 1)
+
+// Encoder 2 (top right)
+#define ENCB_PINA ((PIND >> 5) & 1)
+#define ENCB_PINB ((PIND >> 4) & 1)
+
+// Encoder 3 (bottom right)
+#define ENCC_PINB ((PIND >> 6) & 1)
+#define ENCC_PINA ((PINF >> 0) & 1)
 
 /**
  * Define some global variables.
  */
 
-/// Delay for debouncing
-#define BOUNCE_DELAY_US 50
-#define SETTLE_DELAY_US 4000
 /// Number of encoders on the device
-#define ENCODER_COUNT 1
+#define ENCODER_COUNT 3
 
-/**
- * Map the encoder directions to a character
- * Use two arrays because we want different actions for clockwise/counterclockwise
- */
-const extern uint8_t * ENCODERMAP_CLK;
-const extern uint8_t * ENCODERMAP_CCLK;
 
 // Current pin values when read
 extern uint8_t curA;
@@ -53,22 +54,27 @@ extern uint8_t prevA;
 /// Stored value of the prevoius states of pin B for all encoders
 extern uint8_t prevB;
 
-// Create a single array for the directions thats always updated
-extern uint8_t * directions;
+
 /**
  * Functions
  */
 
 /**
- * Get the directions that the encoders have rotated
- * OUTPUT: -1 if rotated counter clockwise, 1 if rotated clockwise, 0 otherwise. 
- * Results are stored in an array of size #ENCODER_COUNT for each encoder
+ * Read the status of the encoders and determine which
+ * direction they are being rotated
+ * 
+ * INPUT: encoder number [0-5]
+ * OUTPUT: keystroke event corresponding to ENCODERMAP_CLK/CCLK[0-5]
  */
-int8_t * getDirection();
+void getDirection(uint8_t enc);
 
 /**
- * Reads the values of the pins all encoders are attached too
- * Updates the two arrays curA and curB with the binary data of the pins
- * where encoder 0 is the least significant bits
+ * Gets the enocder input per pin
+ * INPUT:
+ *  encNum: The number of the encoder to check
+ *  pinNum: The pin (A or B) of the encoder
+ * 
+ * OUTPUT:
+ *  The status of the desired pin (HIGH or LOW)
  */
-void readEncoders();
+uint8_t readEncoder(uint8_t encNum, uint8_t pinNum);

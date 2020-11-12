@@ -59,21 +59,25 @@ void matrix_init(void)
 {
     // Set all bits to low
     for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-        matrix[i] = 1;
+        matrix[i] = 0;
     }
     // initialize columns to normal input and rows to output
     // Actual switches use a pull up design with hardware debouncing
     // (0: LOW, 1: HIGH) when DDRx[n] == 1 or OUTPUT
     // (0: NORMAL, 1: PULLUP) when DDRx[n] == 0 or INPUT
     DDRB = 0b01110111;
-    DDRD = 0b11110100;
+    DDRD = 0b10000100;
+    DDRF = 0b00000000;
     PORTB =0b00000000;
     PORTD =0b00000000;
+    PORTF =0b00000000;
+    timer_clear();
     print("Init. matrix\n");
 }
 
 uint8_t matrix_scan(void)
 {
+    print("test\n");
     /** Check the status of the timer
      * If the timer count is greater than the threshold
      * then either read the columns or disable all rows
@@ -110,7 +114,9 @@ uint8_t matrix_scan(void)
     // Check the encoders
     // super hack to put it here
     // readEncoders();
-    uint8_t * dirs = getDirection();
+    getDirection(0);
+    getDirection(1);
+    getDirection(2);
     return 1;
 }
 
