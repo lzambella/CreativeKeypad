@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <util/delay.h>
 #include "debug.h"
 #include "actionmap.h"
+#include "encodermap.h"
 /**
  * Teensy pin assignment 
  */
@@ -40,9 +41,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * Define some global variables.
  */
-
-/// Number of encoders on the device
-#define ENCODER_COUNT 3
 
 
 // Current pin values when read

@@ -23,18 +23,6 @@ uint8_t curA = 999;
 
 uint8_t prevA = 0;
 
-/**
- * Codes for the keypad for encoders [1:6]
- * for both clockwise and coutner-clockwise
- * 
- *  TODO: move this to a separate C file for modularity
- */
-action_t ENCODERMAP_CLK[ENCODER_COUNT] = {
-    AC_LBRACKET, AC_MINUS, AC_DOT
-};
-action_t ENCODERMAP_CCLK[ENCODER_COUNT] = {
-    AC_RBRACKET, AC_QUOT, AC_COMMA
-};
 
 // pins [AB]
 // These four states happen each signel turn
