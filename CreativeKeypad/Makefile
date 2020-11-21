@@ -51,7 +51,9 @@ SRC =	keymap.c \
 	matrix.c \
 	led.c \
 	encoder.h \
-	encoder.c
+	encoder.c \
+	encodermap.h \
+	encodermap.c
 
 CONFIG_H = config.h
 

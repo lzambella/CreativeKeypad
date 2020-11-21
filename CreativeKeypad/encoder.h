@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "debug.h"
 #include "actionmap.h"
 #include "encodermap.h"
+
 /**
  * Teensy pin assignment 
  */
@@ -38,6 +39,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ENCC_PINB ((PIND >> 6) & 1)
 #define ENCC_PINA ((PINF >> 0) & 1)
 
+//Encoder 4 (Top left)
+#define ENCD_PINA ((PINF >> 1) & 1)
+#define ENCD_PINB ((PINF >> 4) & 1)
+
+// Encoder 5 (middle left)
+#define ENCE_PINA ((PINF >> 5) & 1)
+#define ENCE_PINB ((PINF >> 6) & 1)
 /**
  * Define some global variables.
  */
@@ -46,11 +54,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Current pin values when read
 extern uint8_t curA;
 extern uint8_t curB;
-
-/// Stored value of the previous states of pin A for all encoders
-extern uint8_t prevA;    
-/// Stored value of the prevoius states of pin B for all encoders
-extern uint8_t prevB;
 
 
 /**

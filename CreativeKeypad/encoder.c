@@ -18,21 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "encoder.h"
-action_t test = AC_LBRACKET;
-uint8_t curA = 999;
-
-uint8_t prevA = 0;
-
-
-// pins [AB]
-// These four states happen each signel turn
-// so for clockwise, pin B will always go low first
-const uint8_t stateCLK[5] = {
-    0b01, 0b00, 0b10, 0b11
-};
-const uint8_t stateCCLK[5] = {
-    0b10, 0b00, 0b01, 0b11
-};
 
 /* TODO: make this function nonblocking
  * Because with 6 encoders there can be funky things that 
@@ -108,6 +93,13 @@ uint8_t readEncoder(uint8_t encNum, uint8_t pinNum) {
             case 2:
                 return ENCC_PINA;
                 break;
+            case 3:
+                return ENCD_PINA;
+                break;
+            case 4:
+                return ENCE_PINA;
+                break;   
+
         }
     // pin B
     } else if (pinNum == 1) {
@@ -120,6 +112,12 @@ uint8_t readEncoder(uint8_t encNum, uint8_t pinNum) {
                 break;
             case 2:
                 return ENCC_PINB;
+                break;
+            case 3: 
+                return ENCD_PINB;
+                break;
+            case 4:
+                return ENCE_PINB;
                 break;
         }
     } 

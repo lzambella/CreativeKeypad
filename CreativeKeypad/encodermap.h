@@ -22,5 +22,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "actionmap.h"
 #include "config.h"
 
-action_t ENCODERMAP_CLK[ENCODER_COUNT];
-action_t ENCODERMAP_CCLK[ENCODER_COUNT];
+extern action_t ENCODERMAP_CLK[ENCODER_COUNT];
+extern action_t ENCODERMAP_CCLK[ENCODER_COUNT];

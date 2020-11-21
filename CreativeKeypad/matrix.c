@@ -77,7 +77,7 @@ void matrix_init(void)
 
 uint8_t matrix_scan(void)
 {
-    print("test\n");
+    //print("test\n");
     /** Check the status of the timer
      * If the timer count is greater than the threshold
      * then either read the columns or disable all rows
@@ -117,6 +117,8 @@ uint8_t matrix_scan(void)
     getDirection(0);
     getDirection(1);
     getDirection(2);
+    getDirection(3);
+    getDirection(4);
     return 1;
 }
 

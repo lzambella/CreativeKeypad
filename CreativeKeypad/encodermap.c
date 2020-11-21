@@ -27,10 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * See the action code header file in the TMK core source
  * for more info on what these can be
  */
-ENCODERMAP_CLK = {
-    AC_LBRACKET, AC_MINUS, AC_DOT
+action_t ENCODERMAP_CLK[ENCODER_COUNT] = {
+    AC_LBRACKET, AC_MINUS, AC_DOT, AC_E, AC_D
 };
 
- ENCODERMAP_CCLK = {
-    AC_RBRACKET, AC_QUOT, AC_COMMA
+ action_t ENCODERMAP_CCLK[ENCODER_COUNT] = {
+    AC_RBRACKET, AC_QUOT, AC_COMMA, AC_R, AC_F
 };
