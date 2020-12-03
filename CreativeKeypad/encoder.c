@@ -19,11 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "encoder.h"
 
-/* TODO: make this function nonblocking
- * Because with 6 encoders there can be funky things that 
- * will happen
-*/ 
+
+
 void getDirection(uint8_t enc) {
+    // reset the timer count
+    timer1_clear();
 
     // First check if pin A was activated
     if (readEncoder(enc, 0) == 0) {
@@ -32,6 +32,12 @@ void getDirection(uint8_t enc) {
         while(readEncoder(enc, 1) == 1) {
             // if pin A gets deactivated then cease operation
             if (readEncoder(enc, 0) == 1) return;
+            // Timeout after 10 total milliseconds
+            if (timer1_read32() > ENCODER_TIMEOUT_COUNT) {
+                if (DEBUG) 
+                    print("TIMEOUT\n");
+                return;
+            }
         }
 
         // wait for state 3 (pin A is diabled)
@@ -39,39 +45,73 @@ void getDirection(uint8_t enc) {
             // check for an invalid state
             // if pinB goes back high then return
             if (readEncoder(enc, 1) == 1) return;
+            // Timeout after 10 total milliseconds
+            if (timer1_read32() > ENCODER_TIMEOUT_COUNT){
+                if (DEBUG)
+                    print("TIMEOUT\n");
+                return;
+            }
         }
         // wait for the final state
         // Pin b going high
         while (readEncoder(enc, 1) == 0) {
             // If pin a goes back low then return
             if (readEncoder(enc, 0) == 0) return;
+            // Timeout after 10 total milliseconds
+            if (timer1_read32() > ENCODER_TIMEOUT_COUNT){
+                if (DEBUG)
+                    print("TIMEOUT\n");
+                return;
+            }
         }
-        print("Counter Clockwise!\n");
+        if(DEBUG)
+            print("Counter Clockwise!\n");
+
         register_code(ENCODERMAP_CLK[enc].code);
         _delay_us(100);
         unregister_code(ENCODERMAP_CLK[enc].code);
         //directions[0] = -1;
     }
+
     // Check the status of pin B if pin A wasnt not activated
     else if (readEncoder(enc, 1) == 0) {
         // wait for pinA to go low (state 2)
         while(readEncoder(enc, 0) == 1) {
             // if pin b goes back high then cease
             if (readEncoder(enc, 1) == 1) return;
+
+            if (timer1_read32() > ENCODER_TIMEOUT_COUNT) {
+                if (DEBUG) 
+                    print("TIMEOUT\n");
+                return;
+            }
         }
         // wait for state 3 (pinB goes high)
         while (readEncoder(enc, 1) == 0) {
             // check for an invalid state
             // if pinA goes back high then return
             if (readEncoder(enc, 0) == 1) return;
+
+            if (timer1_read32() > ENCODER_TIMEOUT_COUNT) {
+                if (DEBUG) 
+                    print("TIMEOUT\n");
+                return;
+            }
         }
         // wait for the final state
         // Pin A going high
         while (readEncoder(enc, 0) == 0) {
             // If pin b goes back low then return
             if (readEncoder(enc, 1) == 0) return;
+
+            if (timer1_read32() > ENCODER_TIMEOUT_COUNT) {
+                if (DEBUG) 
+                    print("TIMEOUT\n");
+                return;
+            }
         }
-        print("Clockwise!\n");
+        if(DEBUG)
+            print("Clockwise!\n");
         register_code(ENCODERMAP_CCLK[enc].code);
         _delay_us(100);
         unregister_code(ENCODERMAP_CCLK[enc].code);
@@ -99,6 +139,8 @@ uint8_t readEncoder(uint8_t encNum, uint8_t pinNum) {
             case 4:
                 return ENCE_PINA;
                 break;   
+            case 5:
+                return ENCF_PINA;
 
         }
     // pin B
@@ -119,6 +161,8 @@ uint8_t readEncoder(uint8_t encNum, uint8_t pinNum) {
             case 4:
                 return ENCE_PINB;
                 break;
+            case 5:
+                return ENCF_PINB;
         }
     } 
 }

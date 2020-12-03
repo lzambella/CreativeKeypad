@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "matrix.h"
 #include <util/delay.h>
 #include "encoder.h"
+#include "timer1.h"
 
 #ifndef DEBOUNCE
 # define DEBOUNCE	5
@@ -65,13 +66,14 @@ void matrix_init(void)
     // Actual switches use a pull up design with hardware debouncing
     // (0: LOW, 1: HIGH) when DDRx[n] == 1 or OUTPUT
     // (0: NORMAL, 1: PULLUP) when DDRx[n] == 0 or INPUT
-    DDRB = 0b01110111;
+    DDRB = 0b00110111;
     DDRD = 0b10000100;
     DDRF = 0b00000000;
     PORTB =0b00000000;
     PORTD =0b00000000;
     PORTF =0b00000000;
     timer_clear();
+    timer1_init();
     print("Init. matrix\n");
 }
 
@@ -119,6 +121,7 @@ uint8_t matrix_scan(void)
     getDirection(2);
     getDirection(3);
     getDirection(4);
+    getDirection(5);
     return 1;
 }
 

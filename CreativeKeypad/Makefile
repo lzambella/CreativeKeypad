@@ -53,7 +53,9 @@ SRC =	keymap.c \
 	encoder.h \
 	encoder.c \
 	encodermap.h \
-	encodermap.c
+	encodermap.c \
+	timer1.h \
+	timer1.c
 
 CONFIG_H = config.h
 

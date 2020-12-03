@@ -23,6 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "debug.h"
 #include "actionmap.h"
 #include "encodermap.h"
+#include "timer1.h"
+
 
 /**
  * Teensy pin assignment 
@@ -32,24 +34,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ENCA_PINB ((PINC >> 7) & 1)
 
 // Encoder 2 (top right)
-#define ENCB_PINA ((PIND >> 5) & 1)
-#define ENCB_PINB ((PIND >> 4) & 1)
+#define ENCB_PINB ((PIND >> 5) & 1)
+#define ENCB_PINA ((PIND >> 4) & 1)
 
 // Encoder 3 (bottom right)
-#define ENCC_PINB ((PIND >> 6) & 1)
-#define ENCC_PINA ((PINF >> 0) & 1)
+#define ENCC_PINA ((PIND >> 6) & 1)
+#define ENCC_PINB ((PINF >> 0) & 1)
 
 //Encoder 4 (Top left)
-#define ENCD_PINA ((PINF >> 1) & 1)
-#define ENCD_PINB ((PINF >> 4) & 1)
+#define ENCD_PINB ((PINF >> 1) & 1)
+#define ENCD_PINA ((PINF >> 4) & 1)
 
 // Encoder 5 (middle left)
 #define ENCE_PINA ((PINF >> 5) & 1)
 #define ENCE_PINB ((PINF >> 6) & 1)
-/**
- * Define some global variables.
- */
 
+// Encoder 6
+#define ENCF_PINA ((PINF >> 7) & 1)
+#define ENCF_PINB ((PINB >> 6) & 1)
+
+#define ENCODER_TIMEOUT_COUNT 5
+#define DEBUG 1
 
 // Current pin values when read
 extern uint8_t curA;
@@ -63,6 +68,10 @@ extern uint8_t curB;
 /**
  * Read the status of the encoders and determine which
  * direction they are being rotated
+ * 
+ * This function has 10 milliseconds total to send a keystroke to the PC
+ * If that threshold gets exceeded then return and do nothing
+ * This is to make the system as nonblocking as possible
  * 
  * INPUT: encoder number [0-5]
  * OUTPUT: keystroke event corresponding to ENCODERMAP_CLK/CCLK[0-5]
