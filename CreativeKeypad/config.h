@@ -39,7 +39,7 @@ All buttons are resisitive pull up (IE pressing sends a LOW to mcu pin)
 #define MATRIX_COLS 4
 
 // Number of encoders on the device
-#define ENCODER_COUNT 5
+#define ENCODER_COUNT 6
 
 /* define if matrix has ghost */
 //#define MATRIX_HAS_GHOST

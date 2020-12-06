@@ -1,125 +1,151 @@
-/**
-COPYRIGHT 2020 LUKE ZAMBELLA
-Encoder Handler
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
- */
-
 #include "encoder.h"
 
+enum state {
+    REST,   
+    CW_A,   
+    CW_B,   
+    CW_C,   
+    CCW_A,  
+    CCW_B, 
+    CCW_C
+};
+// Current state of each encoder
+uint8_t curRead[6] = {0b11, 0b11, 0b11, 0b11, 0b11, 0b11};
+uint8_t prevRead[6] = {0b11, 0b11, 0b11, 0b11, 0b11, 0b11};
+// current state 0-3 for clockwise 0-(-3) for counter clockwise
+int curState[6] = {REST, REST, REST, REST, REST, REST};
+void updateStates(uint8_t enc) {
+    // Read the encoder state into two bits
+    uint8_t pinA = readEncoder(enc, 0);
+    uint8_t pinB = readEncoder(enc, 1);
+    // store the current reading
+    curRead[enc] = (pinA << 1) | pinB;
 
-
-void getDirection(uint8_t enc) {
-    // reset the timer count
-    timer1_clear();
-
-    // First check if pin A was activated
-    if (readEncoder(enc, 0) == 0) {
-        // Next wait for pin B to activate by
-        // blocking until the pin goes low
-        while(readEncoder(enc, 1) == 1) {
-            // if pin A gets deactivated then cease operation
-            if (readEncoder(enc, 0) == 1) return;
-            // Timeout after 10 total milliseconds
-            if (timer1_read32() > ENCODER_TIMEOUT_COUNT) {
-                if (DEBUG) 
-                    print("TIMEOUT\n");
-                return;
-            }
+    // Check if pin A or B have gone low on the current read
+    if (prevRead[enc] == 0b11 && curState[enc] == REST) {
+        if (pinA == 0) {
+            #ifdef DEBUG_STATE
+                print("STATE 0 -> 1 CCW\n");
+            #endif
+            curState[enc] = CCW_A;
+        } else if (pinB == 0) {
+            curState[enc] = CW_A;
+        } else {
+            // invalid state then reset
+            curState[enc] = REST;
         }
-
-        // wait for state 3 (pin A is diabled)
-        while (readEncoder(enc, 0) == 0) {
-            // check for an invalid state
-            // if pinB goes back high then return
-            if (readEncoder(enc, 1) == 1) return;
-            // Timeout after 10 total milliseconds
-            if (timer1_read32() > ENCODER_TIMEOUT_COUNT){
-                if (DEBUG)
-                    print("TIMEOUT\n");
-                return;
-            }
+    } 
+    // State 2 CW or CCW, check for both pins low on current read
+    if (prevRead[enc] == 0b10 && curState[enc] == CW_A) {
+        if (pinA == 0 && pinB == 0) {
+            curState[enc] = CW_B;
+        } else if (pinA == 1 && pinB == 0) {
+            // State stays the same if pins are the same
+            curState[enc] = CW_A;
+        } else {
+            curState[enc] = REST;
         }
-        // wait for the final state
-        // Pin b going high
-        while (readEncoder(enc, 1) == 0) {
-            // If pin a goes back low then return
-            if (readEncoder(enc, 0) == 0) return;
-            // Timeout after 10 total milliseconds
-            if (timer1_read32() > ENCODER_TIMEOUT_COUNT){
-                if (DEBUG)
-                    print("TIMEOUT\n");
-                return;
-            }
+    } else if (prevRead[enc] == 0b01 && curState[enc] == CCW_A) {
+        if (pinA == 0 && pinB == 0) {
+            #ifdef DEBUG_STATE
+                print("STATE 1 -> 2 CCW\n");
+            #endif
+            curState[enc] = CCW_B;
+        } else if (pinA == 0 && pinB == 1) {
+            // Pins stay the same so does the state
+            curState[enc] = CCW_A;
+        } else {
+            curState[enc] = REST;
         }
-        if(DEBUG)
-            print("Counter Clockwise!\n");
+    }
+    
+    // State 3, first pin goes back high
+    if (prevRead[enc] == 0b00 && curState[enc] == CW_B) {
+        if (pinA == 0 && pinB == 1) {
+            curState[enc] = CW_C;
+        } else if (pinA == 0 && pinB == 0) {
+            // state stays the same
+            curState[enc] = CW_B;
+        } else {
+            curState[enc] = REST;
+        }
+    } else if (prevRead[enc] == 0b00 && curState[enc] == CCW_B) {
+        if (pinA == 1 && pinB == 0) {
+            #ifdef DEBUG_STATE
+                print("STATE 2 -> 3 CCW\n");
+            #endif
+            curState[enc] = CCW_C;
+        } else if (pinA == 0 && pinB == 0) {
+            curState[enc] = CCW_B;
+        } else {
+            curState[enc] = REST;
+        }
+    }
 
+    // state 4: both pins are high
+    // Send a keycode on a successful read
+    if (prevRead[enc] == 0b01 && curState[enc] == CW_C) {
+        if (pinA == 1 && pinB == 1) {
+            // send keystroke and reset state to rest
+            sendKeyAction(enc, 0);
+            curState[enc] = REST;
+        } else if (pinA == 0 && pinB == 1) {
+            // same state
+            curState[enc] = CW_C;
+        } else {
+            // invalid state
+            curState[enc] = REST;
+        }
+    } else if (prevRead[enc] == 0b10 && curState[enc] == CCW_C) {
+        if (pinA == 1 && pinB == 1) {
+            sendKeyAction(enc, 1);
+            curState[enc] = REST;
+        } else if (pinA == 1 && pinB == 0) {
+            curState[enc] = CCW_C;
+        } else {
+            curState[enc] = REST;
+        }
+    }
+
+
+    // update the previous state at the end of the iteration
+    // reset to high if in the rest state at all
+    prevRead[enc] = curRead[enc];
+    
+}
+
+/**
+ * Send the correct key action
+ * on a successful state traversal
+ */
+void sendKeyAction(uint8_t enc, uint8_t dir) {
+    #ifdef DEBUG
+    print("ENCODER #");
+    print_dec(enc);
+    print(" ROTATED ");
+    if (dir == 1) {
+        print("COUNTER CLOCKWISE\n");
+    } else {
+        print("CLOCKWISE\n");
+    }
+    #endif
+
+    // Check the keymap from encodermap and send the action
+    // TODO: Add support for modifier keys
+    // make this non blocking as well
+    // Clockwise codes
+    if (dir == 0) {
         register_code(ENCODERMAP_CLK[enc].code);
         _delay_us(100);
         unregister_code(ENCODERMAP_CLK[enc].code);
-        //directions[0] = -1;
-    }
-
-    // Check the status of pin B if pin A wasnt not activated
-    else if (readEncoder(enc, 1) == 0) {
-        // wait for pinA to go low (state 2)
-        while(readEncoder(enc, 0) == 1) {
-            // if pin b goes back high then cease
-            if (readEncoder(enc, 1) == 1) return;
-
-            if (timer1_read32() > ENCODER_TIMEOUT_COUNT) {
-                if (DEBUG) 
-                    print("TIMEOUT\n");
-                return;
-            }
-        }
-        // wait for state 3 (pinB goes high)
-        while (readEncoder(enc, 1) == 0) {
-            // check for an invalid state
-            // if pinA goes back high then return
-            if (readEncoder(enc, 0) == 1) return;
-
-            if (timer1_read32() > ENCODER_TIMEOUT_COUNT) {
-                if (DEBUG) 
-                    print("TIMEOUT\n");
-                return;
-            }
-        }
-        // wait for the final state
-        // Pin A going high
-        while (readEncoder(enc, 0) == 0) {
-            // If pin b goes back low then return
-            if (readEncoder(enc, 1) == 0) return;
-
-            if (timer1_read32() > ENCODER_TIMEOUT_COUNT) {
-                if (DEBUG) 
-                    print("TIMEOUT\n");
-                return;
-            }
-        }
-        if(DEBUG)
-            print("Clockwise!\n");
+    } else if (dir == 1) {
+        // counter clockwise
         register_code(ENCODERMAP_CCLK[enc].code);
         _delay_us(100);
         unregister_code(ENCODERMAP_CCLK[enc].code);
-        //directions[0] = 1;
     }
 
 }
-
 uint8_t readEncoder(uint8_t encNum, uint8_t pinNum) {
     // Pin A
     if (pinNum == 0) {

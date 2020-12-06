@@ -114,14 +114,12 @@ uint8_t matrix_scan(void)
         timer_clear();
    }
     // Check the encoders
-    // super hack to put it here
-    // readEncoders();
-    getDirection(0);
-    getDirection(1);
-    getDirection(2);
-    getDirection(3);
-    getDirection(4);
-    getDirection(5);
+    updateStates(0);
+    updateStates(1);
+    updateStates(2);
+    updateStates(3);
+    updateStates(4);
+    updateStates(5);
     return 1;
 }
 
