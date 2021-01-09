@@ -34,6 +34,8 @@ All buttons are resisitive pull up (IE pressing sends a LOW to mcu pin)
 #define PRODUCT         CreativePad
 #define DESCRIPTION     firmware for CreativePad
 
+#define _uart_included_h_ 1
+
 /* key matrix size */
 #define MATRIX_ROWS 3
 #define MATRIX_COLS 4
@@ -191,3 +193,26 @@ All buttons are resisitive pull up (IE pressing sends a LOW to mcu pin)
 #endif
 
 #endif
+
+
+#define SERIAL_UART_BAUD        115200
+#define SERIAL_UART_DATA        UDR1
+#define SERIAL_UART_UBRR        ((F_CPU/(16.0*SERIAL_UART_BAUD)-1+0.5))
+#define SERIAL_UART_RXD_VECT    USART1_RX_vect0012012
+#define SERIAL_UART_TXD_READY   (UCSR1A&(1<<UDRE1))
+#define SERIAL_UART_INIT()      do { \
+    UBRR1L = (uint8_t) SERIAL_UART_UBRR;       /* baud rate */ \
+    UBRR1H = ((uint16_t)SERIAL_UART_UBRR>>8);  /* baud rate */ \
+    UCSR1B |= (1<<TXEN1); /* TX interrupt, TX: enable */ \
+    UCSR1C |= (0<<UPM11) | (0<<UPM10);  /* parity: none(00), even(01), odd(11) */ \
+    sei(); \
+} while(0)
+#define SERIAL_UART_RTS_LO()    do { PORTD &= ~(1<<5); } while (0)
+#define SERIAL_UART_RTS_HI()    do { PORTD |=  (1<<5); } while (0)
+
+/**
+    
+    UCSR1D |= (0<<RTSEN) | (0<<CTSEN);  // RTS, CTS  \
+    UCSR1D |= (0<<RTSEN) | (0<<CTSEN);  // RTS, CTS(no flow control by hardware) \
+    DDRD |= (1<<5); PORTD &= ~(1<<5);   // RTS for flow control by firmware  \
+**/

@@ -1,5 +1,4 @@
 #include "encoder.h"
-
 enum state {
     REST,   
     CW_A,   
@@ -128,6 +127,7 @@ void sendKeyAction(uint8_t enc, uint8_t dir) {
     } else {
         print("CLOCKWISE\n");
     }
+    uart_putchar('G');
     #endif
 
     // Check the keymap from encodermap and send the action

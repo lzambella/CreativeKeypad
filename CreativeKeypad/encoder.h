@@ -1,4 +1,5 @@
 #include <avr/io.h>
+#include "uart.h"
 #include "debug.h"
 #include <stdint.h>
 #include "actionmap.h"

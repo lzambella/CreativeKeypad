@@ -66,25 +66,39 @@ void matrix_init(void)
     // Actual switches use a pull up design with hardware debouncing
     // (0: LOW, 1: HIGH) when DDRx[n] == 1 or OUTPUT
     // (0: NORMAL, 1: PULLUP) when DDRx[n] == 0 or INPUT
-    DDRB = 0b00110111;
-    DDRD = 0b10000100;
-    DDRF = 0b00000000;
-    PORTB =0b00000000;
-    PORTD =0b00000000;
-    PORTF =0b00000000;
+
+    // Set the row pins to output
+    DDRB |= (1 << 0);
+    DDRB |= (1 << 1);
+    DDRB |= (1 << 2);
+    
+    // Column pins are input
+    // These should be set to normal read mode because of external pullup
+    DDRB &= ~(1 << 3);
+    DDRB &= ~(1 << 7);
+    DDRD &= ~(1 << 0);
+    DDRD &= ~(1 << 1);
+
+    PORTB &= ~(1 << 3);
+    PORTB &= ~(1 << 7);
+    PORTD &= ~(1 << 0);
+    PORTD &= ~(1 << 1);
+
     timer_clear();
     timer1_init();
-    print("Init. matrix\n");
+
+    // Initialize the UART service
+    // Pins D2(rx) and D3(tx)
+    uart_init(SERIAL_UART_BAUD);
 }
 
 uint8_t matrix_scan(void)
 {
-    //print("test\n");
     /** Check the status of the timer
      * If the timer count is greater than the threshold
      * then either read the columns or disable all rows
      * We need to let each row settle for a very long time
-     * because reason and using a timer ensures that its
+     * because using a timer ensures that its
      * nonblocking to reading the encoders
     */
    if (timer_read() > 8 && settleEdge == 1) {
@@ -170,7 +184,9 @@ static void unselect_rows(void)
     // sets the read mode to normal on the col pins each call
     // which is what it defaults too anyway
     // The lower three bits of port B are the row pins
-    PORTB = 0b00000000;
+    PORTB &= ~(1 << 0);
+    PORTB &= ~(1 << 1);
+    PORTB &= ~(1 << 2);
 }
 
 inline
