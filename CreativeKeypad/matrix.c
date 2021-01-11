@@ -72,24 +72,23 @@ void matrix_init(void)
     DDRB |= (1 << 1);
     DDRB |= (1 << 2);
     
+    PORTB |= 1 << 0;
+    PORTB |= 1 << 1;
+    PORTB |= 1 << 2;
     // Column pins are input
     // These should be set to normal read mode because of external pullup
     DDRB &= ~(1 << 3);
-    DDRB &= ~(1 << 7);
+    DDRB &= ~(1 << 4);
     DDRD &= ~(1 << 0);
     DDRD &= ~(1 << 1);
 
     PORTB &= ~(1 << 3);
-    PORTB &= ~(1 << 7);
+    PORTB &= ~(1 << 4);
     PORTD &= ~(1 << 0);
     PORTD &= ~(1 << 1);
 
     timer_clear();
     timer1_init();
-
-    // Initialize the UART service
-    // Pins D2(rx) and D3(tx)
-    uart_init(SERIAL_UART_BAUD);
 }
 
 uint8_t matrix_scan(void)
@@ -158,8 +157,8 @@ static uint8_t read_cols()
 {
     // Get the state of the columns
     // Remember 0 means that the column has been pressed
-    uint8_t c1 = (~PINB & (1 << 3)) >> 3;
-    uint8_t c2 = (~PINB & (1 << 7)) >> 7;
+    uint8_t c1 = (~PINB & (1 << 3)) >> 3;   //B3
+    uint8_t c2 = (~PINB & (1 << 4)) >> 4;   //B4
 
     uint8_t c3 = (~PIND & (1 << 0)) >> 0;
     uint8_t c4 = (~PIND & (1 << 1)) >> 1;

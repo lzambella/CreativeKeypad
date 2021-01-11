@@ -56,8 +56,6 @@ SRC =	keymap.c \
 	encodermap.c \
 	timer1.h \
 	timer1.c \
-	uart.h \
-	uart.c
 
 CONFIG_H = config.h
 
@@ -135,7 +133,5 @@ VPATH += $(TMK_DIR)
 
 include $(TMK_DIR)/common.mk
 include $(TMK_DIR)/protocol.mk
-#include $(TMK_DIR)/protocol/lufa.mk
-#include $(TMK_DIR)/protocol/vusb.mk
-include $(TMK_DIR)/protocol/bluefruit.mk
+include $(TMK_DIR)/protocol/pjrc.mk
 include $(TMK_DIR)/rules.mk

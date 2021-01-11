@@ -12,7 +12,7 @@
 
 // Encoder 2 (top right)
 #define ENCB_PINB ((PIND >> 5) & 1)
-#define ENCB_PINA ((PIND >> 4) & 1)
+#define ENCB_PINA ((PINB >> 5) & 1)
 
 // Encoder 3 (bottom right)
 #define ENCC_PINA ((PIND >> 6) & 1)
