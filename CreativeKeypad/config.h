@@ -34,8 +34,6 @@ All buttons are resisitive pull up (IE pressing sends a LOW to mcu pin)
 #define PRODUCT         CreativePad
 #define DESCRIPTION     firmware for CreativePad
 
-#define BLUEFRUIT_UART
-
 /* key matrix size */
 #define MATRIX_ROWS 3
 #define MATRIX_COLS 4

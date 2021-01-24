@@ -63,6 +63,8 @@ CONFIG_H = config.h
 # MCU name
 #MCU = at90usb1287
 MCU = atmega32u4
+# define bluetooth
+BLUETOOTH_ENABLE = 1
 
 # Processor frequency.
 #     This will define a symbol, F_CPU, in all source code files equal to the

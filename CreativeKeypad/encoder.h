@@ -11,24 +11,24 @@
 #define ENCA_PINB ((PINC >> 7) & 1)
 
 // Encoder 2 (top right)
-#define ENCB_PINB ((PIND >> 5) & 1)
-#define ENCB_PINA ((PINB >> 5) & 1)
+#define ENCB_PINB ((PINF >> 1) & 1)
+#define ENCB_PINA ((PINF >> 0) & 1)
 
 // Encoder 3 (bottom right)
-#define ENCC_PINA ((PIND >> 6) & 1)
-#define ENCC_PINB ((PINF >> 0) & 1)
+#define ENCC_PINA ((PIND >> 4) & 1)
+#define ENCC_PINB ((PIND >> 6) & 1)
 
 //Encoder 4 (Top left)
-#define ENCD_PINB ((PINF >> 1) & 1)
-#define ENCD_PINA ((PINF >> 4) & 1)
+#define ENCD_PINB ((PINF >> 4) & 1)
+#define ENCD_PINA ((PINF >> 5) & 1)
 
 // Encoder 5 (middle left)
-#define ENCE_PINA ((PINF >> 5) & 1)
-#define ENCE_PINB ((PINF >> 6) & 1)
+#define ENCE_PINA ((PINF >> 6) & 1)
+#define ENCE_PINB ((PINF >> 7) & 1)
 
 // Encoder 6
-#define ENCF_PINA ((PINF >> 7) & 1)
-#define ENCF_PINB ((PINB >> 6) & 1)
+#define ENCF_PINA ((PINB >> 6) & 1)
+#define ENCF_PINB ((PINB >> 5) & 1)
 
 #define ENCODER_TIMEOUT_COUNT 5
 #define DEBUG 1
