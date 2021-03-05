@@ -42,6 +42,7 @@ so there are two 'columns' each dedicated to the clockwise/counter clockwise dir
     { KC_##K20, KC_##K21, KC_##K22, KC_##K23}, \
 }
 
+// Use F13-F24 as a hack, no modern program should utilize these
 const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [0] = KEYMAP(
         0, 1, 2, 3, \
@@ -49,7 +50,13 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         8, 9, LCTRL, LALT
     )
 };
-
+/*const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+    [0] = KEYMAP(
+        F13, F14, F15, F16, \
+        F17, F18, F19, F20, \
+        F21, F22, F23, F24
+    )
+}; */
 /*
  * Fn action definition
  */

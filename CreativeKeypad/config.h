@@ -27,8 +27,8 @@ All buttons are resisitive pull up (IE pressing sends a LOW to mcu pin)
 
 
 /* USB Device descriptor parameter */
-#define VENDOR_ID       0xFEED
-#define PRODUCT_ID      0x1111
+#define VENDOR_ID       0x6FFE
+#define PRODUCT_ID      0x4759
 #define DEVICE_VER      0x0001
 #define MANUFACTURER    LukeZambella
 #define PRODUCT         CreativePad
