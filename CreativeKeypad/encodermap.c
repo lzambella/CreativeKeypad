@@ -28,9 +28,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * for more info on what these can be
  */
 action_t ENCODERMAP_CLK[ENCODER_COUNT] = {
-    AC_A, AC_C, AC_E, AC_G, AC_I, AC_K
+    AC_A, AC_B, AC_C, AC_D, AC_E, AC_F
 };
 
  action_t ENCODERMAP_CCLK[ENCODER_COUNT] = {
-    AC_B, AC_D, AC_F, AC_H, AC_J, AC_L
+    AC_G, AC_H, AC_I, AC_J, AC_K, AC_L
 };
